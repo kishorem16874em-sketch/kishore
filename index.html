@@ -1,1 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 LED Control</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; background: #f4f4f9; }
+        .btn { padding: 15px 30px; font-size: 20px; cursor: pointer; border: none; border-radius: 5px; margin: 10px; transition: 0.3s; }
+        .on { background-color: #4CAF50; color: white; }
+        .off { background-color: #f44336; color: white; }
+        .btn:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
 
+    <h1>Smart LED Control</h1>
+    <p>Status: <span id="statusText">Connecting...</span></p>
+    
+    <button class="btn on" id="onBtn">LED ON</button>
+    <button class="btn off" id="offBtn">LED OFF</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Your specific configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnyrPVCU40a7lvBtosE1AD7ubzr-ecNLU",
+            authDomain: "iot-ki.firebaseapp.com",
+            databaseURL: "https://iot-ki-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "iot-ki",
+            storageBucket: "iot-ki.firebasestorage.app",
+            messagingSenderId: "244189137848",
+            appId: "1:244189137848:web:3837a4252026d2c5311d4d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const ledRef = ref(db, 'LED_STATUS');
+
+        // Update UI when database changes
+        onValue(ledRef, (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('statusText').innerText = (data == 1) ? "ON" : "OFF";
+        });
+
+        // Button Functions
+        document.getElementById('onBtn').onclick = () => set(ledRef, 1);
+        document.getElementById('offBtn').onclick = () => set(ledRef, 0);
+    </script>
+</body>
+</html>
